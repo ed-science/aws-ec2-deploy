@@ -21,7 +21,7 @@ class Setup:
         """
         self.deployment_name = "ec2_bento_deploy_test"
         self.dirpath = tempfile.mkdtemp()
-        print("temp dir {} created!".format(self.dirpath))
+        print(f"temp dir {self.dirpath} created!")
         self.saved_dir = os.path.join(self.dirpath, "saved_dir")
 
         # make config file
@@ -78,7 +78,7 @@ class Setup:
     def teardown(self):
         delete(self.deployment_name, self.ec2_config)
         shutil.rmtree(self.dirpath)
-        print("Removed {}!".format(self.dirpath))
+        print(f"Removed {self.dirpath}!")
 
 
 def test_json(url):
@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
         for test_func, endpoint in TESTS:
             try:
-                print("Testing endpoint /{}...".format(endpoint), end="")
+                print(f"Testing endpoint /{endpoint}...", end="")
                 test_func(url.format(endpoint))
                 print("\033[92m passed! \033[0m")
             except Exception as e:

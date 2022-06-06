@@ -10,7 +10,7 @@ TEMPLATE_FOLDER = os.path.join(os.path.dirname(__file__), "templates")
 
 
 def copy_template(template_name: str, destination_dir: str):
-    template_name = template_name + ".tf"
+    template_name += ".tf"
 
     template_file = os.path.join(destination_dir, TERRAFORM_TEMPLATE_FILE_NAME)
     if os.path.exists(template_file):
@@ -47,10 +47,7 @@ def generate_startup_file(spec: dict, destination_dir: str):
         return
 
     registry_url = spec.get("image_tag").split("/")[0]
-    if spec.get('enable_gpus') is True:
-        gpu_flag = "--gpus all"
-    else:
-        gpu_flag = ""
+    gpu_flag = "--gpus all" if spec.get('enable_gpus') is True else ""
     startup_template_file = os.path.join(TEMPLATE_FOLDER, "startup_script.sh")
     generated_file = os.path.join(destination_dir, "startup_script.sh")
     with open(startup_template_file, "r") as template, open(
@@ -103,15 +100,14 @@ def generate(
     """
     generated_files = []
 
-    if template_type == "terraform":
-        if not values_only:
-            template_file_path = generate_terraform_template(spec, destination_dir)
-            generated_files.append(template_file_path)
-        values_file_path = generate_terraform_values(name, spec, destination_dir)
-        generated_files.append(values_file_path)
-    else:
+    if template_type != "terraform":
         raise TemplateTypeNotDefined(template_type)
 
+    if not values_only:
+        template_file_path = generate_terraform_template(spec, destination_dir)
+        generated_files.append(template_file_path)
+    values_file_path = generate_terraform_values(name, spec, destination_dir)
+    generated_files.append(values_file_path)
     # generate the startup_script (user data file) that will be run during
     # EC2 initialisation
     startup_script = generate_startup_file(spec, destination_dir)
